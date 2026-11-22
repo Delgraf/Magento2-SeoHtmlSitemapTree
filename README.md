@@ -25,7 +25,7 @@ Swissup SEO HTML Sitemap loads the categories of the store, up to the "Max Categ
 - **Columns:** the top-level categories are split across the number of columns set in Swissup, with fewer columns on tablets and phones.
 - Works with Luma-based themes (such as Swissup Argento) and with Breeze: the styles are plain CSS.
 - Translations: English, Italian, German, French and Spanish.
-- No patches to `vendor/` and no database tables.
+- No patches to `vendor/` and no database tables. An uninstaller removes the module's settings with `bin/magento module:uninstall --remove-data`.
 
 ## Requirements
 
@@ -203,6 +203,7 @@ For small changes to the look, you do not need to copy the stylesheet: override 
 - `view/frontend/layout/sitemap_index_index.xml` changes the template of the Swissup `seohtmlsitemap.categories` block to `tree.phtml` when "Enable Hierarchical View" is Yes, and passes it the `ViewModel\CategoryTree` view model. The module loads after `Swissup_SeoHtmlSitemap`, so this template replaces both `sitemap.phtml` and `grouped.phtml`.
 - `Model\Tree\TreeBuilder` reads the categories from the collection of the Swissup block and links each category to its parent with `parent_id`. Names and URLs come from the Swissup block methods, so all Swissup filters and the sort order stay the same.
 - When products are shown inside the categories, `TreeBuilder` reads the products from the collection of the Swissup `seohtmlsitemap.products` block, 500 at a time, and loads their category assignments. When a product is assigned to a category and to one of its subcategories, it is shown only in the subcategory.
+- `Setup\Uninstall` deletes the `seohtmlsitemap/tree_view/*` settings from `core_config_data` when the module is removed with `bin/magento module:uninstall --remove-data`.
 - `Plugin\HideFlatProductsPlugin`, an `around` plugin on `Swissup\SeoHtmlSitemap\Block\Products::toHtml()`, returns an empty block when the products are already shown in the tree. The block stays in the layout, so its collection can still be used.
 - The branches are `<details>` elements, opened or closed by the browser. Without JavaScript the tree still works; only the "Expand All / Collapse All" buttons need it.
 
@@ -231,11 +232,33 @@ With a large catalog, loading the category assignments of every product takes ti
 
 ## Uninstall
 
-The module adds only configuration values, no database tables, so removing its code is all it takes. Without it, the Swissup sitemap goes back to its flat list.
+The module adds no database tables. The only data it stores are its settings in the `core_config_data` table, under paths that start with `seohtmlsitemap/tree_view/`. The settings of Swissup HTML Sitemap are not touched. Without the module, the Swissup sitemap goes back to its flat list.
 
-To turn it off for a while, set "Enable Hierarchical View" to No, or disable the module (step 2) and skip removing the files.
+To turn it off for a while, set "Enable Hierarchical View" to No, or disable it with `bin/magento module:disable Delgraf_SeoHtmlSitemapTree`, without uninstalling it.
 
-### Installed with Composer
+### Installed with Composer (recommended: with the uninstaller)
+
+Magento's `module:uninstall` command removes the package and, with `--remove-data`, runs the module's uninstaller (`Setup/Uninstall.php`), which deletes its settings for every scope.
+
+1. Uninstall the module and its data. The command puts the store in maintenance mode while it runs:
+
+   ```bash
+   bin/magento module:uninstall Delgraf_SeoHtmlSitemapTree --remove-data
+   ```
+
+   Add `--backup-db` to back up the database first, or leave out `--remove-data` to keep the settings, for example if you plan to install the module again.
+
+2. In production mode, recompile and deploy the static content, then clear the cache:
+
+   ```bash
+   bin/magento setup:di:compile
+   bin/magento setup:static-content:deploy
+   bin/magento cache:flush
+   ```
+
+### Installed with Composer, step by step
+
+Use these steps if you prefer not to use `module:uninstall`. The uninstaller does not run, so the settings must be removed by hand (step 5).
 
 1. Put the store in maintenance mode (production stores only):
 
@@ -265,17 +288,17 @@ To turn it off for a while, set "Enable Hierarchical View" to No, or disable the
    bin/magento maintenance:disable
    ```
 
-Alternatively, `bin/magento module:uninstall Delgraf_SeoHtmlSitemapTree` does steps 2 and 3 in one command, also for Composer installations only.
+5. Delete the settings, running this query on the Magento database (add your table prefix if you use one). They do nothing without the module, so this step is optional:
 
-The settings saved in the admin stay in the `core_config_data` table, under paths that start with `seohtmlsitemap/tree_view/`. They do nothing without the module. To remove them, run this query on the Magento database (add your table prefix if you use one):
-
-```sql
-DELETE FROM core_config_data WHERE path LIKE 'seohtmlsitemap/tree_view/%';
-```
+   ```sql
+   DELETE FROM core_config_data WHERE path LIKE 'seohtmlsitemap/tree_view/%';
+   ```
 
 ### Installed manually (app/code)
 
-1. Run steps 1 and 2 above.
+Magento's `module:uninstall` command only works for modules installed with Composer, so the uninstaller cannot run here.
+
+1. Run steps 1 and 2 of the step-by-step Composer uninstall.
 2. Delete the module folder:
 
    ```bash
@@ -284,7 +307,7 @@ DELETE FROM core_config_data WHERE path LIKE 'seohtmlsitemap/tree_view/%';
 
    If `app/code/Delgraf/` is now empty, you can delete it too.
 
-3. Run step 4 above.
+3. Run steps 4 and 5 of the step-by-step Composer uninstall.
 
 ## License
 
