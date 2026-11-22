@@ -1,0 +1,91 @@
+<?php
+/**
+ * Copyright © Delgraf. All rights reserved.
+ * Licensed under the Open Software License version 3.0 (OSL-3.0). See LICENSE.txt for license details.
+ *
+ * Hierarchical sitemap: container template for the categories block.
+ *
+ * @var \Swissup\SeoHtmlSitemap\Block\Categories $block
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer
+ */
+
+use Delgraf\SeoHtmlSitemapTree\Model\Tree\Node;
+use Delgraf\SeoHtmlSitemapTree\ViewModel\CategoryTree;
+
+/** @var CategoryTree $viewModel */
+$viewModel = $block->getData('tree_view_model');
+if (!$viewModel instanceof CategoryTree) {
+    return;
+}
+
+$roots = $viewModel->getRoots($block);
+$orphans = $viewModel->getOrphanProducts();
+if ($roots === [] && $orphans === []) {
+    return;
+}
+
+$treeId = 'sitemap-tree-' . $escaper->escapeHtmlAttr($block->getNameInLayout());
+$columns = $viewModel->getColumnsNumber();
+$nodeTemplate = $block->getTemplateFile('Delgraf_SeoHtmlSitemapTree::tree/node.phtml');
+$productsTemplate = $block->getTemplateFile('Delgraf_SeoHtmlSitemapTree::tree/products.phtml');
+
+// Recursive renderer: closure scope keeps each level's variables isolated.
+$renderNode = function (Node $node, int $depth) use (&$renderNode, $viewModel, $escaper, $productsTemplate, $nodeTemplate): void {
+    include $nodeTemplate;
+};
+$renderProducts = function (array $products) use ($escaper, $productsTemplate): void {
+    include $productsTemplate;
+};
+?>
+<div class="sitemap-block sitemap-tree" id="<?= /* @noEscape */ $treeId ?>">
+    <h3 class="block-subtitle subtitle"><?= $escaper->escapeHtml($block->getTitle()) ?></h3>
+
+    <?php if ($viewModel->showToolbar()): ?>
+        <div class="sitemap-tree__toolbar">
+            <button type="button" class="action secondary sitemap-tree__toggle-all" data-action="expand">
+                <span><?= $escaper->escapeHtml(__('Expand All')) ?></span>
+            </button>
+            <button type="button" class="action secondary sitemap-tree__toggle-all" data-action="collapse">
+                <span><?= $escaper->escapeHtml(__('Collapse All')) ?></span>
+            </button>
+        </div>
+    <?php endif ?>
+
+    <div class="sitemap-block-content">
+        <?php if ($roots !== []): ?>
+            <ul class="sitemap-tree__list sitemap-tree__list--root sitemap-tree--cols-<?= (int) $columns ?>">
+                <?php foreach ($roots as $root): ?>
+                    <?php $renderNode($root, 1) ?>
+                <?php endforeach ?>
+            </ul>
+        <?php endif ?>
+
+        <?php if ($orphans !== []): ?>
+            <div class="sitemap-tree__orphans">
+                <h4 class="sitemap-tree__orphans-title"><?= $escaper->escapeHtml(__('Other Products')) ?></h4>
+                <?php $renderProducts($orphans) ?>
+            </div>
+        <?php endif ?>
+    </div>
+</div>
+
+<?php if ($viewModel->showToolbar()): ?>
+    <?php
+    $script = <<<JS
+(function () {
+    var root = document.getElementById('{$treeId}');
+    if (!root) { return; }
+    root.querySelectorAll('.sitemap-tree__toggle-all').forEach(function (button) {
+        button.addEventListener('click', function () {
+            var open = button.getAttribute('data-action') === 'expand';
+            root.querySelectorAll('details.sitemap-tree__details').forEach(function (details) {
+                details.open = open;
+            });
+        });
+    });
+})();
+JS;
+    ?>
+    <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $script, false) ?>
+<?php endif ?>

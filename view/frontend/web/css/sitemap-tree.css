@@ -1,0 +1,143 @@
+/**
+ * Copyright © Delgraf. All rights reserved.
+ * Licensed under the Open Software License version 3.0 (OSL-3.0). See LICENSE.txt for license details.
+ *
+ * Delgraf_SeoHtmlSitemapTree - hierarchical sitemap styles.
+ * Plain CSS (no LESS) so it works with both Luma-based themes and Breeze.
+ * Colours inherit from the theme; tweak the custom properties below in your child theme.
+ */
+.sitemap-tree {
+    --sitemap-tree-indent: 1.25rem;
+    --sitemap-tree-guide: rgba(0, 0, 0, .12);
+    --sitemap-tree-muted: rgba(0, 0, 0, .5);
+    --sitemap-tree-marker-size: .45rem;
+}
+
+/* Toolbar */
+.sitemap-tree__toolbar {
+    display: flex;
+    gap: .5rem;
+    margin: 0 0 1rem;
+}
+
+/* Lists */
+.sitemap-tree .sitemap-tree__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sitemap-tree .sitemap-tree__list--children,
+.sitemap-tree .sitemap-tree__list--products {
+    margin: .25rem 0 .25rem calc(var(--sitemap-tree-marker-size) + .1rem);
+    padding-left: var(--sitemap-tree-indent);
+    border-left: 1px solid var(--sitemap-tree-guide);
+}
+
+.sitemap-tree .sitemap-tree__item {
+    margin: 0;
+    padding: .15rem 0;
+}
+
+/* Top-level columns (uses Swissup "Number of Columns") */
+.sitemap-tree__list--root {
+    column-gap: 2rem;
+}
+.sitemap-tree--cols-2 { column-count: 2; }
+.sitemap-tree--cols-3 { column-count: 3; }
+.sitemap-tree--cols-4 { column-count: 4; }
+
+.sitemap-tree__list--root > .sitemap-tree__item {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    padding: 0 0 .75rem;
+}
+
+/* Top-level labels */
+.sitemap-tree__list--root > .sitemap-tree__item > .sitemap-tree__details > .sitemap-tree__summary .sitemap-tree__link,
+.sitemap-tree__list--root > .sitemap-tree__item > .sitemap-tree__label .sitemap-tree__link {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+
+/* Summary / disclosure marker */
+.sitemap-tree__summary {
+    display: flex;
+    align-items: baseline;
+    gap: .35rem;
+    cursor: pointer;
+    list-style: none;
+}
+.sitemap-tree__summary::-webkit-details-marker {
+    display: none;
+}
+.sitemap-tree__summary::before {
+    content: "";
+    flex: 0 0 auto;
+    width: var(--sitemap-tree-marker-size);
+    height: var(--sitemap-tree-marker-size);
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: translateY(-.1rem) rotate(-45deg);
+    transition: transform .15s ease;
+    opacity: .6;
+}
+.sitemap-tree__details[open] > .sitemap-tree__summary::before {
+    transform: translateY(-.2rem) rotate(45deg);
+}
+.sitemap-tree__summary:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+/* Leaves: small bullet aligned with the branch marker */
+.sitemap-tree__item--leaf > .sitemap-tree__label,
+.sitemap-tree__item--product {
+    position: relative;
+}
+.sitemap-tree__item--product::before,
+.sitemap-tree__item--leaf > .sitemap-tree__label::before {
+    content: "";
+    display: inline-block;
+    width: .3rem;
+    height: .3rem;
+    margin: 0 .5rem .15rem .05rem;
+    border-radius: 50%;
+    background: var(--sitemap-tree-guide);
+    vertical-align: middle;
+}
+
+.sitemap-tree__count {
+    color: var(--sitemap-tree-muted);
+    font-size: .85em;
+}
+
+.sitemap-tree__orphans {
+    margin-top: 1.5rem;
+}
+.sitemap-tree__orphans-title {
+    margin: 0 0 .5rem;
+}
+.sitemap-tree__orphans .sitemap-tree__list--products {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: 0;
+}
+
+/* Responsive */
+@media (max-width: 1023px) {
+    .sitemap-tree--cols-3,
+    .sitemap-tree--cols-4 { column-count: 2; }
+}
+@media (max-width: 639px) {
+    .sitemap-tree--cols-2,
+    .sitemap-tree--cols-3,
+    .sitemap-tree--cols-4 { column-count: 1; }
+}
+
+/* Print: everything open, no markers */
+@media print {
+    .sitemap-tree__toolbar { display: none; }
+    .sitemap-tree__summary::before { display: none; }
+}

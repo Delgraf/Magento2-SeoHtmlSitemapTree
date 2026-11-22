@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Delgraf. All rights reserved.
+ * Licensed under the Open Software License version 3.0 (OSL-3.0). See LICENSE.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <seohtmlsitemap>
+            <tree_view>
+                <enabled>1</enabled>
+                <collapsible>1</collapsible>
+                <expanded_levels>1</expanded_levels>
+                <show_toolbar>1</show_toolbar>
+                <show_products>0</show_products>
+                <show_uncategorized>1</show_uncategorized>
+                <show_counts>1</show_counts>
+            </tree_view>
+        </seohtmlsitemap>
+    </default>
+</config>

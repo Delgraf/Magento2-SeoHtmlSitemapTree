@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Delgraf. All rights reserved.
+ * Licensed under the Open Software License version 3.0 (OSL-3.0). See LICENSE.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Delgraf_SeoHtmlSitemapTree::css/sitemap-tree.css" media="screen, print"/>
+    </head>
+    <body>
+        <referenceBlock name="seohtmlsitemap.categories">
+            <arguments>
+                <argument name="tree_view_model" xsi:type="object">Delgraf\SeoHtmlSitemapTree\ViewModel\CategoryTree</argument>
+            </arguments>
+            <!-- Runs after Swissup's own setTemplate (module sequence), so it wins over grouped.phtml -->
+            <action method="setTemplate" ifconfig="seohtmlsitemap/tree_view/enabled">
+                <argument name="template" xsi:type="string">Delgraf_SeoHtmlSitemapTree::tree.phtml</argument>
+            </action>
+        </referenceBlock>
+    </body>
+</page>

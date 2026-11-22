@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Delgraf. All rights reserved.
+ * Licensed under the Open Software License version 3.0 (OSL-3.0). See LICENSE.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="Delgraf_SeoHtmlSitemapTree">
+        <sequence>
+            <module name="Magento_Catalog"/>
+            <!-- Our layout must load after Swissup's so our setTemplate() wins -->
+            <module name="Swissup_SeoHtmlSitemap"/>
+        </sequence>
+    </module>
+</config>

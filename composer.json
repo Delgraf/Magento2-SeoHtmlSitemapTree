@@ -1,0 +1,42 @@
+{
+    "name": "delgraf/module-seo-html-sitemap-tree",
+    "description": "Hierarchical, collapsible tree view for the Swissup SEO HTML Sitemap on Magento 2: nested categories, optional products inside their categories, no changes to the Swissup module",
+    "type": "magento2-module",
+    "license": "OSL-3.0",
+    "keywords": [
+        "magento2",
+        "magento2-module",
+        "seo",
+        "sitemap",
+        "html-sitemap",
+        "category-tree",
+        "swissup",
+        "seo-html-sitemap"
+    ],
+    "homepage": "https://github.com/Delgraf/Magento2-SeoHtmlSitemapTree",
+    "authors": [
+        {
+            "name": "Delgraf",
+            "homepage": "https://www.delgraf.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/Delgraf/Magento2-SeoHtmlSitemapTree/issues",
+        "source": "https://github.com/Delgraf/Magento2-SeoHtmlSitemapTree"
+    },
+    "require": {
+        "php": ">=8.2",
+        "magento/framework": "*",
+        "magento/module-catalog": "*",
+        "magento/module-store": "*",
+        "swissup/module-seo-html-sitemap": "^1.1"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Delgraf\\SeoHtmlSitemapTree\\": ""
+        }
+    }
+}

@@ -1,0 +1,51 @@
+<?php
+/**
+ * Copyright © Delgraf. All rights reserved.
+ * Licensed under the Open Software License version 3.0 (OSL-3.0). See LICENSE.txt for license details.
+ *
+ * Reusable recursive node of the sitemap tree.
+ * Rendered through the $renderNode closure defined in tree.phtml.
+ *
+ * @var \Delgraf\SeoHtmlSitemapTree\Model\Tree\Node $node
+ * @var int $depth
+ * @var \Delgraf\SeoHtmlSitemapTree\ViewModel\CategoryTree $viewModel
+ * @var \Magento\Framework\Escaper $escaper
+ * @var callable $renderNode
+ * @var string $productsTemplate
+ */
+
+$isBranch = $node->isBranch();
+$collapsible = $isBranch && $viewModel->isCollapsible();
+$itemClass = 'sitemap-tree__item level-' . $depth . ($isBranch ? ' sitemap-tree__item--branch' : ' sitemap-tree__item--leaf');
+?>
+<li class="<?= $escaper->escapeHtmlAttr($itemClass) ?>">
+    <?php ob_start() ?>
+        <a class="sitemap-tree__link" href="<?= $escaper->escapeUrl($node->getUrl()) ?>"><?= $escaper->escapeHtml($node->getName()) ?></a>
+        <?php if ($isBranch && $viewModel->showCounts()): ?>
+            <span class="sitemap-tree__count">(<?= (int) $node->getItemCount() ?>)</span>
+        <?php endif ?>
+    <?php $label = ob_get_clean() ?>
+
+    <?php ob_start() ?>
+        <?php if ($node->hasChildren()): ?>
+            <ul class="sitemap-tree__list sitemap-tree__list--children">
+                <?php foreach ($node->getChildren() as $child): ?>
+                    <?php $renderNode($child, $depth + 1) ?>
+                <?php endforeach ?>
+            </ul>
+        <?php endif ?>
+        <?php if ($node->hasProducts()): ?>
+            <?php $products = $node->getProducts(); include $productsTemplate; ?>
+        <?php endif ?>
+    <?php $content = ob_get_clean() ?>
+
+    <?php if ($collapsible): ?>
+        <details class="sitemap-tree__details"<?= $viewModel->isExpanded($depth) ? ' open' : '' ?>>
+            <summary class="sitemap-tree__summary"><?= /* @noEscape */ $label ?></summary>
+            <?= /* @noEscape */ $content ?>
+        </details>
+    <?php else: ?>
+        <div class="sitemap-tree__label"><?= /* @noEscape */ $label ?></div>
+        <?= /* @noEscape */ $content ?>
+    <?php endif ?>
+</li>

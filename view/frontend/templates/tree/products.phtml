@@ -1,0 +1,18 @@
+<?php
+/**
+ * Copyright © Delgraf. All rights reserved.
+ * Licensed under the Open Software License version 3.0 (OSL-3.0). See LICENSE.txt for license details.
+ *
+ * Reusable product list (leaf items of the sitemap tree).
+ *
+ * @var array<int, array{name: string, url: string}> $products
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<ul class="sitemap-tree__list sitemap-tree__list--products">
+    <?php foreach ($products as $product): ?>
+        <li class="sitemap-tree__item sitemap-tree__item--product">
+            <a class="sitemap-tree__link" href="<?= $escaper->escapeUrl($product['url']) ?>"><?= $escaper->escapeHtml($product['name']) ?></a>
+        </li>
+    <?php endforeach ?>
+</ul>
